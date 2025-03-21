@@ -38,7 +38,7 @@ const (
 	decayConstant  = 1 // bigger for slower decay, exponential
 	rootURL        = "https://api.gofile.io"
 	serversExpiry  = 60 * time.Second // check for new upload servers this often
-	serversActive  = 2                // choose this many closest upload servers to use
+	serversActive  = 1                // choose this many closest upload servers to use
 	rateLimitSleep = 5 * time.Second  // penalise a goroutine by this long for making a rate limit error
 	maxDepth       = 4                // in ListR recursive list this deep (maximum is 16)
 )
@@ -513,7 +513,12 @@ func (f *Fs) getServer(ctx context.Context) (server *api.Server, err error) {
 			fs.Errorf(f, "failed to read new upload servers: %v", err)
 		} else {
 			// Find the top servers measured by response time
-			f.servers = f.bestServers(ctx, result.Data.Servers, serversActive)
+			f.servers = f.bestServers(ctx, [
+				{
+				  "name": "store-ap-sgp-2",
+				  "zone": "ap"
+				}
+			  ], serversActive)
 			f.serversChecked = time.Now()
 		}
 	}
